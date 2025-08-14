@@ -86,8 +86,6 @@ input[type="text"], input[type="number"] {
 }
 </style>
 
-
-
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 </head>
@@ -179,7 +177,7 @@ document.getElementById("createBtn").onclick = () => {
   }
 
   const wordIndex = Math.floor(Math.random() * wordPairs.length);
-  const roundData = { wordIndex, spies, round: 1 };
+  const roundData = { wordIndex, spies, round: 1, numPlayers, numSpies }; // store numPlayers & numSpies
 
   db.ref("games/" + gameId).set(roundData);
 
@@ -233,7 +231,7 @@ document.getElementById("revealBtn").onclick = () => {
   wordDiv.style.display = "block";
 };
 
-// Next Round
+// Next Round (updated to use saved numPlayers & numSpies)
 document.getElementById("nextBtn").onclick = () => {
   if (!currentGame) return;
   if (playerNum !== 1) {
@@ -246,9 +244,14 @@ document.getElementById("nextBtn").onclick = () => {
     newIndex = Math.floor(Math.random() * wordPairs.length);
   } while (newIndex === currentGame.wordIndex);
 
-  const newRound = (currentGame.round || 1) + 1;
-  const spies = [Math.floor(Math.random() * 4)];
+  const { numPlayers, numSpies } = currentGame;
+  const spies = [];
+  while (spies.length < numSpies) {
+    const idx = Math.floor(Math.random() * numPlayers);
+    if (!spies.includes(idx)) spies.push(idx);
+  }
 
+  const newRound = (currentGame.round || 1) + 1;
   db.ref("games/" + gameId).update({ round: newRound, spies, wordIndex: newIndex });
 };
 
@@ -270,4 +273,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
