@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile responsive -->
 <title>Who's the Spy</title>
 <style>
 body {
@@ -22,6 +23,9 @@ body {
   background: white; /* solid white inside container for contrast */
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 90%;        /* responsive width */
+  max-width: 400px;  /* limits container on large screens */
+  box-sizing: border-box;
 }
 
 h1 {
@@ -37,6 +41,10 @@ button {
   cursor: pointer;
   transition: background 0.3s;
   font-size: 1em;
+  width: 90%;        /* responsive button width */
+  max-width: 220px;
+  margin: 8px auto;  /* center buttons */
+  display: block;
 }
 button:hover {
   background: #eb6750; /* hover darker shade */
@@ -44,9 +52,12 @@ button:hover {
 
 input[type="text"], input[type="number"] {
   padding: 8px;
-  margin: 5px;
+  margin: 5px auto;
   border: 1px solid #ccc;
   border-radius: 6px;
+  width: 90%;        /* responsive input width */
+  max-width: 200px;
+  display: block;
 }
 
 #myWord {
@@ -259,3 +270,4 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
