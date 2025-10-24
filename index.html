@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile responsive -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Who's the Spy</title>
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #ffecd2, #fcb69f); /* gradient background */
+  background: linear-gradient(135deg, #ffecd2, #fcb69f);
   color: #333;
   margin: 0;
   padding: 0;
@@ -16,24 +16,19 @@ body {
   align-items: center;
   min-height: 100vh;
 }
-
 .container {
   text-align: center;
   padding: 30px;
-  background: white; /* solid white inside container for contrast */
+  background: white;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  width: 90%;        /* responsive width */
-  max-width: 400px;  /* limits container on large screens */
+  width: 90%;
+  max-width: 400px;
   box-sizing: border-box;
 }
-
-h1 {
-  color: #333; /* darker gray for heading */
-}
-
+h1 { color: #333; }
 button {
-  background: #ff7e5f; /* button color */
+  background: #ff7e5f;
   color: white;
   padding: 10px 15px;
   border: none;
@@ -41,38 +36,33 @@ button {
   cursor: pointer;
   transition: background 0.3s;
   font-size: 1em;
-  width: 90%;        /* responsive button width */
+  width: 90%;
   max-width: 220px;
-  margin: 8px auto;  /* center buttons */
+  margin: 8px auto;
   display: block;
 }
-button:hover {
-  background: #eb6750; /* hover darker shade */
-}
-
+button:hover { background: #eb6750; }
 input[type="text"], input[type="number"] {
   padding: 8px;
   margin: 5px auto;
   border: 1px solid #ccc;
   border-radius: 6px;
-  width: 90%;        /* responsive input width */
+  width: 90%;
   max-width: 200px;
   display: block;
 }
-
 #myWord {
   font-size: 1.2em;
   padding: 12px;
-  background: #fff4e3; /* light cream background */
-  border-left: 4px solid #ffa45c; /* orange accent */
+  background: #fff4e3;
+  border-left: 4px solid #ffa45c;
   border-radius: 6px;
   margin-top: 10px;
   display: none;
 }
-
 .link-box {
   margin-top: 10px;
-  background: #f5f5f5; /* light gray for links */
+  background: #f5f5f5;
   padding: 8px;
   border-radius: 8px;
   font-size: 0.9em;
@@ -80,115 +70,96 @@ input[type="text"], input[type="number"] {
   text-align: left;
   display: inline-block;
 }
-
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
+.small { font-size: 0.9em; color: #555; margin-top: 6px; }
 </style>
 
+<!-- Firebase compat libraries (works with older code style) -->
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 </head>
 <body>
 <div class="container">
-<h1>Who's the Spy</h1>
+  <h1>Who's the Spy</h1>
 
-<!-- Create Game: number of players & spies -->
-<div style="margin-bottom: 10px;">
-  <label>Number of Players: 
-    <input type="number" id="numPlayers" value="4" min="3" style="width: 60px;">
-  </label>
-  <label style="margin-left: 20px;">Number of Spies: 
-    <input type="number" id="numSpies" value="1" min="1" style="width: 60px;">
-  </label>
-</div>
-<button id="createBtn">Create Game</button>
-<div id="linksContainer" class="hidden"></div>
+  <div style="margin-bottom: 10px;">
+    <label>Number of Players:
+      <input type="number" id="numPlayers" value="4" min="3" style="width: 60px;">
+    </label>
+    <label style="margin-left: 20px;">Number of Spies:
+      <input type="number" id="numSpies" value="1" min="1" style="width: 60px;">
+    </label>
+  </div>
+  <button id="createBtn">Create Game</button>
+  <div id="linksContainer" class="hidden"></div>
 
-<!-- Join Game -->
-<input type="text" id="gameIdInput" placeholder="Enter Game ID">
-<input type="number" id="playerNumInput" placeholder="Player Number">
-<button id="joinBtn">Join Game</button>
+  <input type="text" id="gameIdInput" placeholder="Enter Game ID">
+  <input type="number" id="playerNumInput" placeholder="Player Number">
+  <button id="joinBtn">Join Game</button>
 
-<!-- Reveal Word -->
-<button id="revealBtn" class="hidden">Reveal My Word</button>
-<div id="myWord"></div>
+  <button id="revealBtn" class="hidden">Reveal My Word</button>
+  <div id="myWord"></div>
 
-<!-- Next Round -->
-<button id="nextBtn" class="hidden">Next Round</button>
+  <button id="nextBtn" class="hidden">Next Round</button>
+  <div id="status" class="small"></div>
 </div>
 
 <script>
+/* ---------- FIREBASE CONFIG ---------- */
+/* corrected/normalized storageBucket value (if yours differs keep original) */
 const firebaseConfig = {
   apiKey: "AIzaSyDPISivi6M-4nhCXdRiipjLogTny-zZII8",
   authDomain: "whos-the-spy1.firebaseapp.com",
   databaseURL: "https://whos-the-spy1-default-rtdb.firebaseio.com",
   projectId: "whos-the-spy1",
-  storageBucket: "whos-the-spy1.firebasestorage.app",
+  storageBucket: "whos-the-spy1.appspot.com",
   messagingSenderId: "646903380855",
   appId: "1:646903380855:web:7b89a6ef8e3250813e3f72"
 };
 
-firebase.initializeApp(firebaseConfig);
+try {
+  firebase.initializeApp(firebaseConfig);
+} catch (err) {
+  // If initializeApp is called multiple times in same page, ignore that error
+  if (!/already exists/.test(err.message)) {
+    console.error("Firebase init error:", err);
+    document.getElementById("status").innerText = "Firebase initialization failed. See console.";
+  }
+}
 const db = firebase.database();
 
+/* ---------- STATE ---------- */
 let gameId = null;
 let playerNum = null;
 let currentGame = null;
 
+/* ---------- WORD PAIRS (replace or extend as needed) ---------- */
 const wordPairs = [
-  // your existing pairs ...
-
-  // 🔥 New Funny & Interesting Pairs
-  ["AM", "PM"],
-  ["Khakhra", "Thepla"],
-  ["Doritos", "Lays"],
-  ["Makhana", "Popcorn"],
-  ["Tea", "Green Tea"],
-  ["Insta Story", "Snap Streak"],
-  ["Offline Exam", "Online Exam"],
-  ["Recharge", "WiFi"],
-  ["Zomato", "Swiggy"],
-  ["Socks", "Slippers"],
-  ["Subway", "Burger King"],
-  ["Red Bull", "Monster"],
-  ["Shampoo", "Conditioner"],
-  ["Toothpaste", "Mouthwash"],
-  ["Bed", "Sofa"],
-  ["Keyboard", "Mouse"],
-  ["Netflix & Chill", "Prime & Relax"],
-  ["Mask", "Sanitizer"],
-  ["Birthday Cake", "Anniversary Cake"],
-  ["Tea Break", "Lunch Break"],
-  ["Silent Mode", "Vibrate Mode"],
-  ["Google Meet", "Zoom"],
-  ["MCQ", "Assignment"],
-  ["Cricket Bat", "Hockey Stick"],
-  ["PUBG", "Free Fire"],
-  ["Chess", "Carrom"],
-  ["UNO", "Ludo"],
-  ["Filter Coffee", "Cold Coffee"],
-  ["Sweater", "Jacket"],
-  ["Train Seat", "Train Berth"],
-  ["Rickshaw", "Cab"],
-  ["PhonePe", "Paytm"],
-  ["Tinder", "Bumble"],
-  ["Morning Alarm", "Snooze Button"],
-  ["Chapati", "Roti"],
-  ["Ferrari", "Lamborghini"],
-  ["Fan", "AC"],
-  ["Keyboard Typing", "Voice Typing"],
-  ["Emoji 😀", "Sticker 🐒"],
-  ["Drama Queen", "Overthinker"],
-  ["Pencil Box", "Geometry Box"],
-  ["Shinchan", "Doraemon"],
-  ["Biryani", "Fried Rice"],
-  ["Filter", "No Filter"],
-  ["Reel", "Shorts"]
+  ["Pizza","Burger"], ["Coke","Pepsi"], ["Momos","Dumplings"], ["Samosa","Kachori"],
+  ["Idli","Dosa"], ["Biryani","Pulao"], ["Maggie","Yippee"], ["Gulab Jamun","Rasgulla"],
+  ["Hot Chocolate","Cold Coffee"], ["Tea","Coffee"], ["Green Tea","Black Coffee"],
+  ["Chole Bhature","Pav Bhaji"], ["Paratha","Chapati"], ["Roti","Naan"], ["Fries","Chips"],
+  ["Chocolate","Ice Cream"], ["Khakhra","Thepla"], ["Zomato","Swiggy"], ["PUBG","Free Fire"],
+  ["Instagram","Snapchat"], ["YouTube","Netflix"], ["Reel","Shorts"], ["Tinder","Bumble"],
+  ["WhatsApp","Telegram"], ["Google Meet","Zoom"], ["ChatGPT","Bard"], ["PhonePe","Paytm"],
+  ["iPhone","Android"], ["MacBook","Windows Laptop"], ["Mouse","Keyboard"], ["Fan","AC"],
+  ["Earphones","Headphones"], ["Online Exam","Offline Exam"], ["MCQ","Assignment"],
+  ["Morning Alarm","Snooze Button"], ["Bed","Sofa"], ["Socks","Slippers"], ["Mask","Sanitizer"]
 ];
 
-// Create Game with dynamic players & spies
-document.getElementById("createBtn").onclick = () => {
+/* ---------- HELPERS ---------- */
+function randGameId(len = 6) {
+  return Math.random().toString(36).substring(2, 2 + len);
+}
+
+function showStatus(msg, isError = false) {
+  const s = document.getElementById("status");
+  s.innerText = msg || "";
+  s.style.color = isError ? "crimson" : "#555";
+}
+
+/* ---------- CREATE GAME ---------- */
+document.getElementById("createBtn").addEventListener("click", () => {
   const numPlayers = parseInt(document.getElementById("numPlayers").value) || 4;
   const numSpies = parseInt(document.getElementById("numSpies").value) || 1;
 
@@ -197,8 +168,9 @@ document.getElementById("createBtn").onclick = () => {
     return;
   }
 
-  gameId = Math.random().toString(36).substring(2, 8);
+  gameId = randGameId(6);
 
+  // generate unique spies indices (0-based)
   const spies = [];
   while (spies.length < numSpies) {
     const idx = Math.floor(Math.random() * numPlayers);
@@ -206,101 +178,132 @@ document.getElementById("createBtn").onclick = () => {
   }
 
   const wordIndex = Math.floor(Math.random() * wordPairs.length);
-  const roundData = { wordIndex, spies, round: 1, numPlayers, numSpies }; // store numPlayers & numSpies
+  const roundData = { wordIndex, spies, round: 1, numPlayers, numSpies };
 
-  db.ref("games/" + gameId).set(roundData);
+  db.ref("games/" + gameId).set(roundData, (err) => {
+    if (err) {
+      console.error("Firebase set error:", err);
+      showStatus("Failed to create game (check console).", true);
+      return;
+    }
+    showStatus("Game created: " + gameId);
+    const container = document.getElementById("linksContainer");
+    container.innerHTML = `<h3>Share these links:</h3>`;
+    for (let i = 1; i <= numPlayers; i++) {
+      const link = `${location.origin}${location.pathname}?gameId=${gameId}&player=${i}`;
+      container.innerHTML += `<div class="link-box">Player ${i}: <a href="${link}" target="_blank" rel="noopener">${link}</a></div>`;
+    }
+    container.classList.remove("hidden");
+  });
+});
 
-  const container = document.getElementById("linksContainer");
-  container.innerHTML = `<h3>Share these links:</h3>`;
-  for (let i = 1; i <= numPlayers; i++) {
-    const link = `${location.origin}${location.pathname}?gameId=${gameId}&player=${i}`;
-    container.innerHTML += `<div class="link-box">Player ${i}: <a href="${link}" target="_blank">${link}</a></div>`;
-  }
-  container.classList.remove("hidden");
-};
-
-// Join Game
-document.getElementById("joinBtn").onclick = joinGame;
+/* ---------- JOIN GAME ---------- */
+document.getElementById("joinBtn").addEventListener("click", joinGame);
 
 function joinGame() {
   const urlParams = new URLSearchParams(window.location.search);
-  gameId = document.getElementById("gameIdInput").value || urlParams.get("gameId");
-  playerNum = parseInt(document.getElementById("playerNumInput").value || urlParams.get("player"));
+  gameId = (document.getElementById("gameIdInput").value || urlParams.get("gameId") || "").trim();
+  const playerVal = (document.getElementById("playerNumInput").value || urlParams.get("player") || "").trim();
+  playerNum = playerVal ? parseInt(playerVal, 10) : NaN;
 
-  if (!gameId || !playerNum) {
-    alert("Enter Game ID and Player Number");
+  if (!gameId || !playerNum || isNaN(playerNum)) {
+    alert("Enter valid Game ID and Player Number");
     return;
   }
 
   document.getElementById("revealBtn").classList.remove("hidden");
+  if (playerNum === 1) document.getElementById("nextBtn").classList.remove("hidden");
 
-  if (playerNum === 1) {
-    document.getElementById("nextBtn").classList.remove("hidden");
-  }
-
+  // Listen for game changes. Add error handler as 2nd arg
   db.ref("games/" + gameId).on("value", snap => {
     const data = snap.val();
-    if (data) {
-      currentGame = data;
-      updateUIForRound(data);
+    if (!data) {
+      showStatus("Game not found. Check Game ID.", true);
+      currentGame = null;
+      return;
     }
+    currentGame = data;
+    showStatus(`Joined game ${gameId}. Round ${data.round || 1}`);
+    updateUIForRound(data);
+  }, (err) => {
+    console.error("Firebase read error:", err);
+    showStatus("Error reading game state (see console).", true);
   });
 }
 
-// Reveal Word
-document.getElementById("revealBtn").onclick = () => {
-  if (!currentGame) return;
-  const pair = wordPairs[currentGame.wordIndex];
+/* ---------- REVEAL WORD ---------- */
+document.getElementById("revealBtn").addEventListener("click", () => {
+  if (!currentGame) {
+    alert("No game data available yet. Wait a moment or rejoin.");
+    return;
+  }
+  const idx = parseInt(currentGame.wordIndex, 10);
+  if (isNaN(idx) || idx < 0 || idx >= wordPairs.length) {
+    alert("Word index is invalid. Ask the host to restart the round.");
+    return;
+  }
+  const pair = wordPairs[idx];
+  // spies stored as array of indices (0-based)
   let myWord = pair[0];
-  if (currentGame.spies.includes(playerNum - 1)) {
+  if (Array.isArray(currentGame.spies) && currentGame.spies.includes(playerNum - 1)) {
     myWord = pair[1];
   }
   const wordDiv = document.getElementById("myWord");
   wordDiv.innerText = "Your word: " + myWord;
   wordDiv.style.display = "block";
-};
+});
 
-// Next Round (updated to use saved numPlayers & numSpies)
-document.getElementById("nextBtn").onclick = () => {
-  if (!currentGame) return;
-  if (playerNum !== 1) {
-    alert("Only Player 1 can start the next round.");
-    return;
-  }
+/* ---------- NEXT ROUND ---------- */
+document.getElementById("nextBtn").addEventListener("click", () => {
+  if (!currentGame) { alert("No game to advance."); return; }
+  if (playerNum !== 1) { alert("Only Player 1 can start the next round."); return; }
 
   let newIndex;
   do {
     newIndex = Math.floor(Math.random() * wordPairs.length);
-  } while (newIndex === currentGame.wordIndex);
+  } while (newIndex === currentGame.wordIndex && wordPairs.length > 1);
 
-  const { numPlayers, numSpies } = currentGame;
+  const numPlayers = parseInt(currentGame.numPlayers, 10) || 4;
+  const numSpies = parseInt(currentGame.numSpies, 10) || 1;
+
   const spies = [];
   while (spies.length < numSpies) {
     const idx = Math.floor(Math.random() * numPlayers);
     if (!spies.includes(idx)) spies.push(idx);
   }
 
-  const newRound = (currentGame.round || 1) + 1;
-  db.ref("games/" + gameId).update({ round: newRound, spies, wordIndex: newIndex });
-};
+  const newRound = (parseInt(currentGame.round, 10) || 1) + 1;
+  db.ref("games/" + gameId).update({ round: newRound, spies, wordIndex: newIndex }, (err) => {
+    if (err) {
+      console.error("Firebase update error:", err);
+      showStatus("Failed to start next round (see console).", true);
+    } else {
+      showStatus("Started round " + newRound);
+      document.getElementById("myWord").style.display = "none";
+    }
+  });
+});
 
-// UI update
+/* ---------- UI UPDATE ---------- */
 function updateUIForRound(data) {
   document.getElementById("myWord").style.display = "none";
-  console.log(`Round ${data.round} started with word index ${data.wordIndex}`);
+  // show/hide nextBtn if player 1 or not (defensive)
+  if (playerNum === 1) document.getElementById("nextBtn").classList.remove("hidden");
+  else document.getElementById("nextBtn").classList.add("hidden");
+  // small console debug
+  console.log("Game data:", data);
 }
 
-// Auto-join from link
-window.onload = () => {
+/* ---------- AUTO JOIN FROM LINK ---------- */
+window.addEventListener("load", () => {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get("gameId") && urlParams.get("player")) {
     document.getElementById("gameIdInput").value = urlParams.get("gameId");
     document.getElementById("playerNumInput").value = urlParams.get("player");
-    joinGame();
+    // call joinGame after small delay to allow firebase init
+    setTimeout(joinGame, 250);
   }
-};
+});
 </script>
 </body>
 </html>
-
-
